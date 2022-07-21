@@ -7,6 +7,7 @@ const morgan = require("morgan")
 //Routes
 const { userRouter } = require("./routes/user.routes")
 const { productRouter } = require("./routes/product.routes")
+const { viewsRouter } = require("./routes/views.routes")
 
 //Global err controller
 const { globalErrorHandler } = require("./controllers/globalErrorHandler.controllers")
@@ -41,6 +42,7 @@ if(process.env.NODE_ENV === "development") app.use(morgan("dev"))
 else app.use(morgan("combined"))
 
 //Endpoints
+app.use("/", viewsRouter)
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/products", productRouter)
     
