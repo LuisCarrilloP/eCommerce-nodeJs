@@ -1,4 +1,4 @@
-/* const nodemailer = require("nodemailer")
+const nodemailer = require("nodemailer")
 const dotenv = require("dotenv")
 const pug = require("pug")
 const path = require("path")
@@ -7,8 +7,8 @@ const { htmlToText } = require("html-to-text")
 dotenv.config({ path: "./confif.env" })
 
 class Email{
-    constructor(){
-
+    constructor(to){
+        this.to = to
     }
 
     //Connect to mail service
@@ -24,12 +24,28 @@ class Email{
     }
 
     //Send the actual mail
-    async send(){
+    async send(template, subject, mailData){
         const html = pug.renderFile(
-            path.join(__dirname, " ", "views", "emails", "base.pug"),
-            {
-                title: "My first mail", => 
-            }
+            path.join(__dirname, "..", "views", "email", `${template}.pug`),
+            mailData
         )
+
+        await this.newTransport().sendMail({
+            from: process.env.MAIL_FROM,
+            to: this.to,
+            subject,
+            html,
+            text: htmlToText(html)
+        })
     }
-} */
+
+    async sendWelcome(name){
+        await this.send("welcome", "Welcome to our app", { name })
+    }
+
+    async sendCart(){
+        await this.send("cart", "Your recent order")
+    }
+}
+
+module.exports = { Email }

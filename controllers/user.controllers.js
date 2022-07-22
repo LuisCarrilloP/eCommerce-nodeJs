@@ -11,6 +11,7 @@ const { Order } = require("../models/order.models")
 //Utils
 const { AppError } = require("../utils/appError.utils")
 const { catchAsync } = require("../utils/catchAsync.utils")
+const { Email } = require("../utils/email.utils")
 
 
 
@@ -31,6 +32,9 @@ const createUser = catchAsync( async( req, res, next ) => {
 
     //Remove password from response
     newUser.password = undefined
+
+    //Send welcome email
+    await new Email(email).sendWelcome(name)
 
     res.status(201).json({
         status: "sucess",
