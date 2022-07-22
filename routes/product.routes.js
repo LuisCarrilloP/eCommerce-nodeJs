@@ -9,6 +9,9 @@ const { protectSession } = require("../middlewares/auth.middleware")
 const { productExist } = require("../middlewares/productExist.middleware")
 const { categoryExist } = require("../middlewares/categoryExist.middleware")
 
+//Utils
+const { upload } = require("../utils/upload.utils")
+
 const productRouter = express.Router()
 
 productRouter.post("/", protectSession, createProductValidators, createProduct)
