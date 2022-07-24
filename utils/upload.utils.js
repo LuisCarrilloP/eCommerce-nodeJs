@@ -1,14 +1,20 @@
 const multer = require("multer")
+const path = require("path")
 
-const storage = multer.diskStorage({
+//para almacenar en local
+/* const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "/imgs")
+        cb(null, path.join(__dirname, "..", "imgs"))
     },
     filename: (req, file, cb) => {
-        console.log(file);
-        cb(null, "test.png")
+        const filename = `${Date.now()}_${file.originalname}`
+        cb(null, filename)
     }
-})
+}) */
+
+
+//almacenar en memoria
+const storage = multer.memoryStorage()
 
 const upload = multer({ storage })
 
