@@ -1,8 +1,9 @@
-const { ref, uploadBytes } = require("firebase/storage")
+const { ref, uploadBytes, getDownloadURL } = require("firebase/storage")
 
 //Models
 const { Product } = require("../models/product.models")
 const { Category } = require("../models/category.models")
+const { ProductImgs } = require("../models/productImgs.models")
 
 //Utils
 const { AppError } = require("../utils/appError.utils")
@@ -14,22 +15,27 @@ const createProduct = catchAsync( async( req, res, next ) => {
     const { sessionUser } = req
     const { title, description, price, categoryId, quantity } = req.body
 
-    const imgRef = ref(storage, `${Date.now()}_${req.file.originalname}`)
+    const imgRef = ref(storage, `products/${Date.now()}_${req.file.originalname}`)
 
     const imgRes = await uploadBytes(imgRef, req.file.buffer)
 
-    /* const newProduct = await Product.create({
+    const newProduct = await Product.create({
         title,
         description,
         price,
         categoryId,
         quantity,
         userId: sessionUser.dataValues.id
-    }) */
+    })
+
+    await ProductImgs.create({ 
+        productId: newProduct.id,
+        imgUrl: imgRes.metadata.fullPath
+    })
 
     res.status(201).json({
         status: "sucess",
-        /* newProduct */
+        newProduct
     })
 })
 
@@ -47,15 +53,18 @@ const getAllProducts = catchAsync( async( req, res, next ) => {
 const getProductById = catchAsync( async( req, res, next ) => {
     const { product } = req
 
-    const productId = await Product.findOne({
+    const imgRef = ref(storage, product.productImgs[0].imgUrl)
+    const imgFullPath = await getDownloadURL(imgRef)
+    product.productImgs[0].imgUrl = imgFullPath
+    /* const productId = await Product.findOne({
         where: { id: product.id },
         attributes: ["id", "title", "price", "status"]
-    })
+    }) */
 
     res.status(200).json({
         status: "sucess",
         message: "Here you have your product",
-        productId
+        product
     })
 })
 
