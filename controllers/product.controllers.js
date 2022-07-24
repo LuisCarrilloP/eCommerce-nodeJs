@@ -12,18 +12,18 @@ const createProduct = catchAsync( async( req, res, next ) => {
     const { title, description, price, categoryId, quantity } = req.body
 
 
-    const newProduct = await Product.create({
+    /* const newProduct = await Product.create({
         title,
         description,
         price,
         categoryId,
         quantity,
         userId: sessionUser.dataValues.id
-    })
+    }) */
 
     res.status(201).json({
         status: "sucess",
-        newProduct
+        /* newProduct */
     })
 })
 

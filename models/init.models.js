@@ -16,17 +16,28 @@ const initModels = () => {
     User.hasOne(Cart, { foreignKey: "userId" })
     Cart.belongsTo(User)
 
+    //User 1 ---- M Product
+    User.hasMany(Product, { foreignKey: "userId" })
+    Product.belongsTo(User)
+
     //Product 1 --- M ProductImgs
     Product.hasMany(ProductImgs, { foreignKey: "productId" })
-    Product.belongsTo(Product)
+    ProductImgs.belongsTo(Product)
 
     //Category 1 --- M Products
     Category.hasMany(Product, { foreignKey: "categoryId" })
     Product.belongsTo(Category)
 
     //Cart 1 --- M ProductsInCart
-    Cart.hasMany(ProductsInCart, { foreignKey: "cartId" })
+    Cart.hasMany(ProductsInCart, { foreignKey: "cartId" }) /* **** */
     ProductsInCart.belongsTo(Cart)
+
+    //Cart 1 --- 1 Order
+    Cart.hasOne(Order, { foreignKey: "cartId" })
+    Order.belongsTo(Cart)
+
+    //Product 1 ---- 1 ProductInCart
+
 }
 
 module.exports = { initModels }
