@@ -7,6 +7,9 @@ dotenv.config({ path: "./config.env" })
 //Models
 const { User } = require("../models/user.models")
 const { Order } = require("../models/order.models")
+const { Cart } = require("../models/cart.models")
+const { Product } = require("../models/product.models")
+const { ProductsInCart } = require("../models/productsInCart.models")
 
 //Utils
 const { AppError } = require("../utils/appError.utils")
@@ -80,6 +83,22 @@ const getAllUsers = catchAsync( async( req, res, next ) => {
     })
 })
 
+const getUserProducts = catchAsync( async( req, res, next ) => {
+    const { userSession } = req
+    const userProducts = await Product.findAll({
+        where: { userId: userSession.id }
+    })
+
+    if(!userProducts){
+        return next("No products made by this user", 400)
+    }
+
+    res.status(200).json({
+        status: "sucess",
+        userProducts
+    })
+})
+
 const updateUser = catchAsync( async( req, res, next ) => {
     const { user } = req
     const { name, email } = req.body
@@ -115,19 +134,30 @@ const deleteUser = catchAsync( async( req, res, next ) => {
 const getAllOrdersByUser = catchAsync( async( req, res, next ) => {
     const { sessionUser } = req
 
-    const user = await User.findOne({
-        where: { status: "active", id: sessionUser.id },
-        attributes: ["id", "name", "email", "status", "role"],
+    const userOrders = await Order.findAll({
+        where: { userId: sessionUser.id },
         include: [
-            { model: Order,
-            attributes: ["id", "userId", "cartId", "totalPrice", "status"]
+            { model: Cart, 
+                required:false,
+                include: { 
+                    model: ProductsInCart,
+                        required: false,
+                        include: { 
+                            model: Cart,
+                                required: false
+                        }
+                    }
             }
         ]
     })
 
+    if(!userOrders){
+        return next(new AppError("No orders to show", 400))
+    }
+
     res.status(200).json({
         status: "sucess",
-        user
+        userOrders
     })
 })
 
@@ -139,10 +169,14 @@ const getOrderById = catchAsync( async ( req, res, next ) => {
         include: [{model: User}]
     })
 
+    if(!orderId){
+        return next(new AppError("No order found", 404))
+    }
+
     res.status(200).json({
         status: "sucess",
         orderId
     })
 })
 
-module.exports = { createUser, login, getAllUsers, updateUser, deleteUser, getAllOrdersByUser, getOrderById }
+module.exports = { createUser, login, getAllUsers, getUserProducts, updateUser, deleteUser, getAllOrdersByUser, getOrderById }

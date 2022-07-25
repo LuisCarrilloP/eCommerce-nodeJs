@@ -9,6 +9,7 @@ const path = require("path")
 const { userRouter } = require("./routes/user.routes")
 const { productRouter } = require("./routes/product.routes")
 const { viewsRouter } = require("./routes/views.routes")
+const { cartRouter } = require("./routes/cart.routes")
 
 //Global err controller
 const { globalErrorHandler } = require("./controllers/globalErrorHandler.controllers")
@@ -53,6 +54,7 @@ else app.use(morgan("combined"))
 app.use("/", viewsRouter)
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/products", productRouter)
+app.use("/api/v1/cart", cartRouter)
     
 //Handle unknown routes
 app.all("*", (req, res, next) => {

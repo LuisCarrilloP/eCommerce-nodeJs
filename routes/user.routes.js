@@ -1,7 +1,7 @@
 const express = require("express")
 
 //Controllers
-const { createUser, login, getAllUsers, updateUser, deleteUser, getAllOrdersByUser, getOrderById } = require("../controllers/user.controllers")
+const { createUser, login, getAllUsers, getUserProducts, updateUser, deleteUser, getAllOrdersByUser, getOrderById } = require("../controllers/user.controllers")
 
 //Middlewares
 const { createUserValidators } = require("../middlewares/validators.middlewares")
@@ -15,9 +15,9 @@ const userRouter = express.Router()
 userRouter.post("/", createUserValidators, createUser)
 userRouter.post("/login", login)
 
-userRouter.get("/", protectSession, getAllUsers)
+userRouter.get("/", /* protectSession, */ getAllUsers)
+userRouter.get("/me", protectSession, getUserProducts)
 
-userRouter.get("/me")
 userRouter.patch("/:id", protectSession, userExist, protectUserAccount, updateUser)
 userRouter.delete("/:id", protectSession, userExist, protectUserAccount, deleteUser)
 userRouter.get("/orders", protectSession, getAllOrdersByUser)
