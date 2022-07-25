@@ -15,10 +15,6 @@ const createProduct = catchAsync( async( req, res, next ) => {
     const { sessionUser } = req
     const { title, description, price, categoryId, quantity } = req.body
 
-    const imgRef = ref(storage, `products/${Date.now()}_${req.file.originalname}`)
-
-    const imgRes = await uploadBytes(imgRef, req.file.buffer)
-
     const newProduct = await Product.create({
         title,
         description,
@@ -27,11 +23,20 @@ const createProduct = catchAsync( async( req, res, next ) => {
         quantity,
         userId: sessionUser.dataValues.id
     })
-
-    await ProductImgs.create({ 
-        productId: newProduct.id,
-        imgUrl: imgRes.metadata.fullPath
-    })
+    
+    if(req.files.length > 0){
+        const filesPromises = req.files.map(async file => {
+            const imgRef = ref(storage, `products/${Date.now()}_${file.originalname}`)
+            const imgRes = await uploadBytes(imgRef, file.buffer)
+    
+            return await ProductImgs.create({ 
+                productId: newProduct.id,
+                imgUrl: imgRes.metadata.fullPath
+            })
+        })
+    
+        await Promise.all(filesPromises)
+    }
 
     res.status(201).json({
         status: "sucess",
@@ -53,9 +58,15 @@ const getAllProducts = catchAsync( async( req, res, next ) => {
 const getProductById = catchAsync( async( req, res, next ) => {
     const { product } = req
 
-    const imgRef = ref(storage, product.productImgs[0].imgUrl)
-    const imgFullPath = await getDownloadURL(imgRef)
-    product.productImgs[0].imgUrl = imgFullPath
+    //Map async
+    const productImgsPromises = product.productImgs.map(async productImg => {
+        const imgRef = ref(storage, productImg.imgUrl)
+        const imgFullPath = await getDownloadURL(imgRef)
+        productImg.imgUrl = imgFullPath
+    })
+
+    const productImgsResolved = await Promise.all(productImgsPromises)
+
     /* const productId = await Product.findOne({
         where: { id: product.id },
         attributes: ["id", "title", "price", "status"]

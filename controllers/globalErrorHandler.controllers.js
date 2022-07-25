@@ -38,11 +38,15 @@ const handleJWTError = () => {
 	return new AppError("Invalid session. Please try it again", 401)
 }
 
+const handleImgExceedError = () => {
+    return new AppError("You exceeded the number of images allowed", 400)
+}
+
 const globalErrorHandler = (err, req, res, next) => {
-    if(process.env.NODE_ENV === "development"){
+    if(process.env.NODE_ENV === "production"){
         sendErrorDev(err,req,res)
-    }else if(process.env.NODE_ENV === "production"){
-        let error = {...err}
+    }else if(process.env.NODE_ENV === "development"){
+        let error = { ...err }
         error.message = err.message
 
         if(err.name === "SequelizeUniqueConstraintError"){
@@ -51,9 +55,11 @@ const globalErrorHandler = (err, req, res, next) => {
             error = handleJWTExpiredError()
         }else if(err.name === "JsonWebTokenError"){
             error = handleJWTError()
+        }else if(err.code === "LIMIT_UNEXPECTED_FILE"){
+            error = handleImgExceedError()
         }
 
-        sendErrorProd(err, req, res)
+        sendErrorProd(error, req, res)
     }
 }
 
