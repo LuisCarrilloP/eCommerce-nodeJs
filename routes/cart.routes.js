@@ -1,16 +1,17 @@
 const express = require("express")
 
 //Controllers
-const { addProductToCart, updateCart, deleteProduct } = require("../controllers/cart.controller")
+const { getUserCart, addProductToCart, updateProductInCart, deleteProductFromCart, purchaseCart } = require("../controllers/cart.controller")
 
 //Middlewares
 const { protectSession } = require("../middlewares/auth.middleware")
 
-cartRouter = express.Router()
+const cartRouter = express.Router()
 
+cartRouter.get("/", protectSession, getUserCart)
 cartRouter.post("/add-product", protectSession, addProductToCart)
-cartRouter.patch("/update-cart", protectSession, updateCart)
-cartRouter.delete("/:productId", protectSession, deleteProduct)
-cartRouter.post("/purchase", protectSession)
+cartRouter.patch("/update-cart", protectSession, updateProductInCart)
+cartRouter.delete("/:productId", protectSession, deleteProductFromCart)
+cartRouter.post("/purchase", protectSession, purchaseCart)
 
 module.exports = { cartRouter }

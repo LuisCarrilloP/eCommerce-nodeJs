@@ -14,7 +14,7 @@ const { upload } = require("../utils/upload.utils")
 
 const productRouter = express.Router()
 
-productRouter.post("/", protectSession, /* createProductValidators, */ upload.array("productImg", 5), createProduct)
+productRouter.post("/", protectSession, upload.array("productImg", 5), createProductValidators, createProduct)
 productRouter.get("/", getAllProducts) /* ***** */
 productRouter.get("/:id", productExist, getProductById )
 productRouter.patch("/:id", protectSession, productExist, updateProduct)
