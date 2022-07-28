@@ -3,5 +3,13 @@ extends base
 block emailContent
     p Hi there, #{newOrder}!,
         p Thank you for your purchase! 
-        p Your total is $#{totalPrice}
-        
+    div
+        if productInCart.length === 0
+            p No products
+        else
+            each product in productInCart 
+                div
+                    h3 Item: #{product.product.title}
+                    p Price per product: $#{product.product.price}
+                    p Quantity: #{product.quantity}
+        p Total price: $#{totalPrice}

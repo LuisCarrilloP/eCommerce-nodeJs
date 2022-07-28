@@ -54,7 +54,7 @@ class Email{
     }
 
     async sendPurchase(totalPrice, /* sessionUser.name */ newOrder){
-        await this.send("purchase", "Your recent order", { totalPrice, /* sessionUser.name */ newOrder })
+        await this.send("purchase", "Your recent order", { totalPrice, /* sessionUser.name */ newOrder, productInCart })
     }
 }
 

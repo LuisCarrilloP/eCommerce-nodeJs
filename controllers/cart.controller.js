@@ -213,7 +213,7 @@ const purchaseCart = catchAsync( async( req, res, next ) => {
     await cart.update({ status: "purchased" })
 
     //Send purchase
-    await new Email(sessionUser.email).sendPurchase(totalPrice, sessionUser.name, newOrder)
+    await new Email(sessionUser.email).sendPurchase(totalPrice, sessionUser.name, newOrder, cart.productInCarts)
 
     res.status(200).json({ status: "sucess", message: "Thanks for your purchase", newOrder })
 })
